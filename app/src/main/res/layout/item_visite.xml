@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground">
+
+    <TextView
+        android:id="@+id/tv_id"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.5"
+        android:text="ID"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.2"
+        android:text="Date"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_motif"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:text="Motif"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_bilan"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1.5"
+        android:text="Bilan"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_visiteur"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Visiteur"
+        android:textSize="12sp" />
+
+    <TextView
+        android:id="@+id/tv_praticien"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Praticien"
+        android:textSize="12sp" />
+
+</LinearLayout>

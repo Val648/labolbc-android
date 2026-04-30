@@ -4,11 +4,7 @@ plugins {
 
 android {
     namespace = "com.example.labolbc_android"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.labolbc_android"
@@ -21,6 +17,9 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField("String", "BASE_URL", "\"https://ttj-api.vltmc.fr/api/\"");
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -45,10 +44,10 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.gson)
 
+    implementation(libs.navigation.fragment)
+    implementation(libs.navigation.ui)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    implementation("androidx.navigation:navigation-fragment-ktx:2.9.7")
-    implementation("androidx.navigation:navigation-ui-ktx:2.9.7")
 }

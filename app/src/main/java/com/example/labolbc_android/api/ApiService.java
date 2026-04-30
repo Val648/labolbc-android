@@ -1,5 +1,9 @@
 package com.example.labolbc_android.api;
 
+import com.example.labolbc_android.entity.LoginRequest;
+import com.example.labolbc_android.entity.LoginResponse;
+import com.example.labolbc_android.entity.Visite;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -23,7 +27,7 @@ public interface ApiService {
     Call<Visite> getVisiteVisiteur(@Path("id") int id);
 
     @POST("/visiteur/visites")
-    Call<List<Visite>> createVisite(@Body Visite visite);
+    Call<Visite> createVisite(@Body Visite visite);
 
     @GET("/visiteur/visites/{id}/report")
     Call<List<Visite>> createCompteRendu(@Path("id") int id, @Body Visite visite);

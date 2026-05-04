@@ -8,14 +8,14 @@ android {
 
     defaultConfig {
         applicationId = "com.example.labolbc_android"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "BASE_URL", "\"https://localhost:5555/api/\"")
+        buildConfigField("String", "BASE_URL", "\"http://10.53.55.191:5555/api/\"")
     }
 
     buildTypes {
@@ -25,7 +25,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://ttj-api.vltmc.fr/api/\"")
+            buildConfigField("String", "BASE_URL", "\"http://10.53.55.191:5555/api/\"")
         }
     }
     compileOptions {
@@ -49,6 +49,8 @@ dependencies {
 
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    
+    implementation(libs.swiperefreshlayout)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

@@ -2,16 +2,12 @@ package com.example.labolbc_android.entity;
 
 public class User {
     private int id;
-    private String nom;
-    private String prenom;
+    private String name;
     private String email;
-    private String statut;
     private String type;
 
     public int getId() { return id; }
-    public String getNom() { return nom; }
-    public String getPrenom() { return prenom; }
+    public String getName() { return name; }
     public String getEmail() { return email; }
-    public String getStatut() { return statut; }
     public String getType() { return type; }
 }

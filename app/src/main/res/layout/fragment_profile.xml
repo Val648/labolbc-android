@@ -8,17 +8,29 @@
     android:padding="16dp">
 
     <TextView
+        android:id="@+id/tv_profile_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Détail du Profil"
         android:textColor="@color/blue_dark"
-        android:textSize="20sp" />
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:id="@+id/tv_profile_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chargement des informations..."
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_marginBottom="32dp"/>
 
     <Button
         android:id="@+id/btn_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:text="Se déconnecter"
         android:backgroundTint="@color/blue_primary" />
 </LinearLayout>

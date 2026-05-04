@@ -12,6 +12,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.labolbc_android.R;
 import com.example.labolbc_android.api.ApiClient;
 import com.example.labolbc_android.api.ApiService;
@@ -31,11 +32,20 @@ public class AllVisitsFragment extends Fragment {
     private List<Visite> visiteList = new ArrayList<>();
     private List<Visite> filteredList = new ArrayList<>();
     private SearchView searchView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_all_visits, container, false);
+      
+        swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_all_visits);
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setOnRefreshListener(() -> {
+                // Logique de rechargement ici (ex: appel API)
+                refreshData();
+            });
+        }
 
         recyclerView = view.findViewById(R.id.rv_visites);
         searchView = view.findViewById(R.id.search_view);
@@ -116,5 +126,14 @@ public class AllVisitsFragment extends Fragment {
                 Toast.makeText(getContext(), "Données de test affichées (Serveur injoignable)", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void refreshData() {
+        // Simulation d'un chargement réseau
+        swipeRefreshLayout.postDelayed(() -> {
+            if (swipeRefreshLayout != null) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        }, 1500);
     }
 }

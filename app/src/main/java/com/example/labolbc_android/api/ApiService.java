@@ -1,6 +1,9 @@
 package com.example.labolbc_android.api;
 
 import com.example.labolbc_android.entity.Visite;
+import com.example.labolbc_android.entity.LoginRequest;
+import com.example.labolbc_android.entity.LoginResponse;
+import com.example.labolbc_android.entity.RegisterRequest;
 
 import java.util.List;
 import retrofit2.Call;
@@ -35,4 +38,10 @@ public interface ApiService {
 
     @DELETE("visiteur/visites/{id}")
     Call<Void> deleteVisite(@Path("id") int id);
+
+    @POST("login")
+    Call<LoginResponse> login(@Body LoginRequest request);
+
+    @POST("register")
+    Call<LoginResponse> register(@Body RegisterRequest request);
 }

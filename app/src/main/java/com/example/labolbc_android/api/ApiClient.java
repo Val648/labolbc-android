@@ -3,6 +3,8 @@ package com.example.labolbc_android.api;
 import android.content.Context;
 import com.example.labolbc_android.BuildConfig;
 import com.example.labolbc_android.SessionManager;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
@@ -27,10 +29,14 @@ public class ApiClient {
                 })
                 .build();
 
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+                .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.BASE_URL)
                 .client(okHttpClient)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
         return retrofit.create(ApiService.class);

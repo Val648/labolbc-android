@@ -19,7 +19,6 @@ import com.example.labolbc_android.api.ApiService;
 import com.example.labolbc_android.api.VisiteAdapter;
 import com.example.labolbc_android.entity.Visite;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,9 +40,8 @@ public class AllVisitsFragment extends Fragment {
       
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_all_visits);
         if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setOnRefreshListener(this::refreshData);
-            // Optionnel : Couleurs du cercle de chargement
-            swipeRefreshLayout.setColorSchemeResources(R.color.blue_primary, android.R.color.holo_blue_dark);
+            swipeRefreshLayout.setOnRefreshListener(this::fetchVisites);
+            swipeRefreshLayout.setColorSchemeResources(R.color.blue_primary);
         }
 
         recyclerView = view.findViewById(R.id.rv_visites);
@@ -55,7 +53,6 @@ public class AllVisitsFragment extends Fragment {
 
         setupSearchView();
         
-        // Charger les données initiales
         fetchVisites();
 
         return view;
@@ -94,7 +91,6 @@ public class AllVisitsFragment extends Fragment {
     }
 
     private void fetchVisites() {
-        // Indiquer visuellement le chargement si ce n'est pas initié par un swipe
         if (swipeRefreshLayout != null && !swipeRefreshLayout.isRefreshing()) {
             swipeRefreshLayout.setRefreshing(true);
         }
@@ -111,9 +107,7 @@ public class AllVisitsFragment extends Fragment {
                     visiteList.addAll(response.body());
                     filter(searchView.getQuery().toString());
                 } else {
-                    Toast.makeText(getContext(), "Erreur serveur", Toast.LENGTH_SHORT).show();
-                    // Données de secours pour la démo si l'API échoue
-                    addMockDataIfEmpty();
+                    Toast.makeText(getContext(), "Erreur serveur: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -123,21 +117,8 @@ public class AllVisitsFragment extends Fragment {
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 Log.e("AllVisitsFragment", "Failure: " + t.getMessage());
-                Toast.makeText(getContext(), "Impossible de contacter le serveur", Toast.LENGTH_SHORT).show();
-                addMockDataIfEmpty();
+                Toast.makeText(getContext(), "Erreur de connexion", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private void addMockDataIfEmpty() {
-        if (visiteList.isEmpty()) {
-            visiteList.add(new Visite(1, new Date(), "Visite de routine", "Bilan.pdf", "Jean Dupont", "Dr. Martin"));
-            visiteList.add(new Visite(2, new Date(), "Suivi mensuel", "Suivi.pdf", "Alice Durand", "Dr. Bernard"));
-            filter(searchView.getQuery().toString());
-        }
-    }
-
-    private void refreshData() {
-        fetchVisites();
     }
 }

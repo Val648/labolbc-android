@@ -1,25 +1,26 @@
 package com.example.labolbc_android.entity;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
 public class Visite {
     private int id;
+    
+    @SerializedName("date")
     private Date dateVisite;
+    
+    @SerializedName("motif")
     private String motifVisite;
+    
+    @SerializedName("bilan")
     private String bilanVisite;
-    private String nomVisiteur;
-    private String nomPraticien;
+    
+    private String compteRendu; // Lien vers le PDF
+    
+    private Visiteur visiteur;
+    private Praticien praticien;
 
     public Visite() {}
-
-    public Visite(int id, Date dateVisite, String motifVisite, String bilanVisite, String nomVisiteur, String nomPraticien) {
-        this.id = id;
-        this.dateVisite = dateVisite;
-        this.motifVisite = motifVisite;
-        this.bilanVisite = bilanVisite;
-        this.nomVisiteur = nomVisiteur;
-        this.nomPraticien = nomPraticien;
-    }
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -33,9 +34,20 @@ public class Visite {
     public String getBilanVisite() { return bilanVisite; }
     public void setBilanVisite(String bilanVisite) { this.bilanVisite = bilanVisite; }
 
-    public String getNomVisiteur() { return nomVisiteur; }
-    public void setNomVisiteur(String nomVisiteur) { this.nomVisiteur = nomVisiteur; }
+    public String getCompteRendu() { return compteRendu; }
+    public void setCompteRendu(String compteRendu) { this.compteRendu = compteRendu; }
 
-    public String getNomPraticien() { return nomPraticien; }
-    public void setNomPraticien(String nomPraticien) { this.nomPraticien = nomPraticien; }
+    public Visiteur getVisiteur() { return visiteur; }
+    public void setVisiteur(Visiteur visiteur) { this.visiteur = visiteur; }
+
+    public Praticien getPraticien() { return praticien; }
+    public void setPraticien(Praticien praticien) { this.praticien = praticien; }
+
+    public String getNomVisiteur() {
+        return visiteur != null ? visiteur.getNomVisiteur() : "Inconnu";
+    }
+
+    public String getNomPraticien() {
+        return praticien != null ? (praticien.getNomPraticien() + " " + praticien.getPrenomPraticien()) : "Inconnu";
+    }
 }

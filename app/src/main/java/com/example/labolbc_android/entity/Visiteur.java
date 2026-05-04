@@ -1,18 +1,17 @@
 package com.example.labolbc_android.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Visiteur {
-    private int idVisiteur;
+    private int id;
+    
+    @SerializedName("nom")
     private String nomVisiteur;
 
     public Visiteur() {}
 
-    public Visiteur(int idVisiteur, String nomVisiteur) {
-        this.idVisiteur = idVisiteur;
-        this.nomVisiteur = nomVisiteur;
-    }
-
-    public int getIdVisiteur() { return idVisiteur; }
-    public void setIdVisiteur(int idVisiteur) { this.idVisiteur = idVisiteur; }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getNomVisiteur() { return nomVisiteur; }
     public void setNomVisiteur(String nomVisiteur) { this.nomVisiteur = nomVisiteur; }

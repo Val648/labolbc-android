@@ -49,6 +49,16 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         holder.tvMotif.setText(visite.getMotifVisite());
         holder.tvVisiteur.setText(visite.getNomVisiteur());
         holder.tvPraticien.setText(visite.getNomPraticien());
+        
+        // Affichage du bilan textuel dans la partie dépliée
+        holder.tvBilanText.setText(visite.getBilanVisite() != null ? visite.getBilanVisite() : "Aucun bilan saisi.");
+
+        // Afficher ou cacher le bouton de téléchargement selon si compteRendu est présent
+        if (visite.getCompteRendu() != null && !visite.getCompteRendu().isEmpty()) {
+            holder.btnDownloadPdf.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnDownloadPdf.setVisibility(View.GONE);
+        }
 
         holder.itemView.setOnClickListener(v -> {
             boolean isVisible = holder.layoutBilan.getVisibility() == View.VISIBLE;
@@ -63,12 +73,22 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
     }
 
     private void processPdf(Context context, Visite visite) {
-        String assetFileName = "feuille1.pdf";
-        File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "bilan_visite_" + visite.getId() + ".pdf");
+        String pdfUrl = visite.getCompteRendu();
+        if (pdfUrl == null || pdfUrl.isEmpty()) return;
 
+        // Si le lien est interne (assets), on garde la logique de copie pour le test
+        if (pdfUrl.equals("feuille1.pdf")) {
+            copyAssetPdf(context, visite, pdfUrl);
+        } else {
+            // Sinon, téléchargement normal via internet
+            downloadFromWeb(context, visite, pdfUrl);
+        }
+    }
+
+    private void copyAssetPdf(Context context, Visite visite, String fileName) {
+        File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "compte_rendu_" + visite.getId() + ".pdf");
         try {
-            // 1. Copy file from assets to Downloads
-            InputStream in = context.getAssets().open(assetFileName);
+            InputStream in = context.getAssets().open(fileName);
             OutputStream out = new FileOutputStream(outFile);
             byte[] buffer = new byte[1024];
             int read;
@@ -78,13 +98,24 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
             in.close();
             out.flush();
             out.close();
-
-            // 2. Open the file
             openPdf(context, outFile);
-
         } catch (Exception e) {
-            Log.e("VisiteAdapter", "Erreur: " + e.getMessage());
-            fallbackToWebDownload(context, visite);
+            Toast.makeText(context, "Erreur lecture fichier local", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void downloadFromWeb(Context context, Visite visite, String url) {
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            request.setTitle("Compte-Rendu Visite " + visite.getId());
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "compte_rendu_" + visite.getId() + ".pdf");
+
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            if (manager != null) manager.enqueue(request);
+            Toast.makeText(context, "Téléchargement du PDF lancé...", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context, "URL invalide ou erreur réseau", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -95,26 +126,9 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
             intent.setDataAndType(uri, "application/pdf");
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
             context.startActivity(intent);
         } catch (Exception e) {
-            Toast.makeText(context, "Aucune application trouvée pour ouvrir le PDF", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    private void fallbackToWebDownload(Context context, Visite visite) {
-        String dummyUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf";
-        try {
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(dummyUrl));
-            request.setTitle("Bilan Visite " + visite.getId());
-            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "bilan_web_" + visite.getId() + ".pdf");
-
-            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            if (manager != null) manager.enqueue(request);
-            Toast.makeText(context, "Téléchargement web lancé...", Toast.LENGTH_SHORT).show();
-        } catch (Exception e) {
-            Toast.makeText(context, "Impossible de récupérer le PDF", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Aucune application PDF trouvée", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -129,7 +143,7 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
     }
 
     static class VisiteViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDate, tvMotif, tvVisiteur, tvPraticien, tvClickHint;
+        TextView tvDate, tvMotif, tvVisiteur, tvPraticien, tvClickHint, tvBilanText;
         LinearLayout layoutBilan;
         Button btnDownloadPdf;
         View divider;
@@ -141,6 +155,7 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
             tvVisiteur = itemView.findViewById(R.id.tv_visiteur);
             tvPraticien = itemView.findViewById(R.id.tv_praticien);
             tvClickHint = itemView.findViewById(R.id.tv_click_hint);
+            tvBilanText = itemView.findViewById(R.id.tv_bilan_text);
             layoutBilan = itemView.findViewById(R.id.layout_bilan);
             btnDownloadPdf = itemView.findViewById(R.id.btn_download_pdf);
             divider = itemView.findViewById(R.id.divider);

@@ -1,20 +1,20 @@
 package com.example.labolbc_android.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Praticien {
-    private int idPraticien;
+    private int id;
+    
+    @SerializedName("nom")
     private String nomPraticien;
+    
+    @SerializedName("prenom")
     private String prenomPraticien;
 
     public Praticien() {}
 
-    public Praticien(int idPraticien, String nomPraticien, String prenomPraticien) {
-        this.idPraticien = idPraticien;
-        this.nomPraticien = nomPraticien;
-        this.prenomPraticien = prenomPraticien;
-    }
-
-    public int getIdPraticien() { return idPraticien; }
-    public void setIdPraticien(int idPraticien) { this.idPraticien = idPraticien; }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
     public String getNomPraticien() { return nomPraticien; }
     public void setNomPraticien(String nomPraticien) { this.nomPraticien = nomPraticien; }

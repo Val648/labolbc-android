@@ -37,7 +37,7 @@ public class ProfileFragment extends Fragment {
 
         User user = sessionManager.getUser();
         if (user != null && tvProfileInfo != null) {
-            tvProfileInfo.setText("Bienvenue, " + user.getNom() + "\nEmail: " + user.getEmail());
+            tvProfileInfo.setText("Bienvenue, " + user.getName() + "\nEmail: " + user.getEmail());
         }
 
         btnLogout.setOnClickListener(v -> {

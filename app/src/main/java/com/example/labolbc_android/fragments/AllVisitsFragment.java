@@ -41,10 +41,9 @@ public class AllVisitsFragment extends Fragment {
       
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_all_visits);
         if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setOnRefreshListener(() -> {
-                // Logique de rechargement ici (ex: appel API)
-                refreshData();
-            });
+            swipeRefreshLayout.setOnRefreshListener(this::refreshData);
+            // Optionnel : Couleurs du cercle de chargement
+            swipeRefreshLayout.setColorSchemeResources(R.color.blue_primary, android.R.color.holo_blue_dark);
         }
 
         recyclerView = view.findViewById(R.id.rv_visites);
@@ -56,9 +55,7 @@ public class AllVisitsFragment extends Fragment {
 
         setupSearchView();
         
-        // Ajouter des données d'exemple pour le test
-        addMockData();
-        
+        // Charger les données initiales
         fetchVisites();
 
         return view;
@@ -96,44 +93,51 @@ public class AllVisitsFragment extends Fragment {
         adapter.notifyDataSetChanged();
     }
 
-    private void addMockData() {
-        visiteList.clear();
-        visiteList.add(new Visite(1, new Date(), "Visite de routine", "Bilan_Routine.pdf", "Jean Dupont", "Dr. Martin"));
-        visiteList.add(new Visite(2, new Date(), "Présentation nouveau médicament", "Nouveau_Medoc.pdf", "Alice Durand", "Dr. Bernard"));
-        visiteList.add(new Visite(3, new Date(), "Suivi trimestriel", "Suivi_T3.pdf", "Jean Dupont", "Dr. Leroy"));
-        visiteList.add(new Visite(4, new Date(), "Urgence médicale", "Urgence_04.pdf", "Alice Durand", "Dr. Martin"));
-        
-        filteredList.clear();
-        filteredList.addAll(visiteList);
-        adapter.notifyDataSetChanged();
-    }
-
     private void fetchVisites() {
+        // Indiquer visuellement le chargement si ce n'est pas initié par un swipe
+        if (swipeRefreshLayout != null && !swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
         ApiService apiService = ApiClient.getService(getContext());
         apiService.getVisites().enqueue(new Callback<List<Visite>>() {
             @Override
-            public void onResponse(Call<List<Visite>> call, Response<List<Visite>> response) {
+            public void onResponse(@NonNull Call<List<Visite>> call, @NonNull Response<List<Visite>> response) {
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
                 if (response.isSuccessful() && response.body() != null) {
                     visiteList.clear();
                     visiteList.addAll(response.body());
                     filter(searchView.getQuery().toString());
+                } else {
+                    Toast.makeText(getContext(), "Erreur serveur", Toast.LENGTH_SHORT).show();
+                    // Données de secours pour la démo si l'API échoue
+                    addMockDataIfEmpty();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Visite>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Visite>> call, @NonNull Throwable t) {
+                if (swipeRefreshLayout != null) {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
                 Log.e("AllVisitsFragment", "Failure: " + t.getMessage());
-                Toast.makeText(getContext(), "Données de test affichées (Serveur injoignable)", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Impossible de contacter le serveur", Toast.LENGTH_SHORT).show();
+                addMockDataIfEmpty();
             }
         });
     }
 
+    private void addMockDataIfEmpty() {
+        if (visiteList.isEmpty()) {
+            visiteList.add(new Visite(1, new Date(), "Visite de routine", "Bilan.pdf", "Jean Dupont", "Dr. Martin"));
+            visiteList.add(new Visite(2, new Date(), "Suivi mensuel", "Suivi.pdf", "Alice Durand", "Dr. Bernard"));
+            filter(searchView.getQuery().toString());
+        }
+    }
+
     private void refreshData() {
-        // Simulation d'un chargement réseau
-        swipeRefreshLayout.postDelayed(() -> {
-            if (swipeRefreshLayout != null) {
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        }, 1500);
+        fetchVisites();
     }
 }

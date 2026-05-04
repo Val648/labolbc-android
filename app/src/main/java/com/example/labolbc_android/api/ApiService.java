@@ -1,5 +1,6 @@
 package com.example.labolbc_android.api;
 
+import com.example.labolbc_android.entity.Praticien;
 import com.example.labolbc_android.entity.Visite;
 import com.example.labolbc_android.entity.LoginRequest;
 import com.example.labolbc_android.entity.LoginResponse;
@@ -38,6 +39,9 @@ public interface ApiService {
 
     @DELETE("visiteur/visites/{id}")
     Call<Void> deleteVisite(@Path("id") int id);
+
+    @GET("visiteur/praticiens")
+    Call<List<Praticien>> getPraticiensSameRegion();
 
     @POST("login")
     Call<LoginResponse> login(@Body LoginRequest request);

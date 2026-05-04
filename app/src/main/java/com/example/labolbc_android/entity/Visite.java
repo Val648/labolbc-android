@@ -7,18 +7,18 @@ public class Visite {
     private Date dateVisite;
     private String motifVisite;
     private String bilanVisite;
-    private int idVisiteur;
-    private int idPraticien;
+    private String nomVisiteur;
+    private String nomPraticien;
 
     public Visite() {}
 
-    public Visite(int id, Date dateVisite, String motifVisite, String bilanVisite, int idVisiteur, int idPraticien) {
+    public Visite(int id, Date dateVisite, String motifVisite, String bilanVisite, String nomVisiteur, String nomPraticien) {
         this.id = id;
         this.dateVisite = dateVisite;
         this.motifVisite = motifVisite;
         this.bilanVisite = bilanVisite;
-        this.idVisiteur = idVisiteur;
-        this.idPraticien = idPraticien;
+        this.nomVisiteur = nomVisiteur;
+        this.nomPraticien = nomPraticien;
     }
 
     public int getId() { return id; }
@@ -33,9 +33,9 @@ public class Visite {
     public String getBilanVisite() { return bilanVisite; }
     public void setBilanVisite(String bilanVisite) { this.bilanVisite = bilanVisite; }
 
-    public int getIdVisiteur() { return idVisiteur; }
-    public void setIdVisiteur(int idVisiteur) { this.idVisiteur = idVisiteur; }
+    public String getNomVisiteur() { return nomVisiteur; }
+    public void setNomVisiteur(String nomVisiteur) { this.nomVisiteur = nomVisiteur; }
 
-    public int getIdPraticien() { return idPraticien; }
-    public void setIdPraticien(int idPraticien) { this.idPraticien = idPraticien; }
+    public String getNomPraticien() { return nomPraticien; }
+    public void setNomPraticien(String nomPraticien) { this.nomPraticien = nomPraticien; }
 }

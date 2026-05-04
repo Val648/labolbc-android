@@ -35,7 +35,4 @@ public interface ApiService {
 
     @DELETE("visiteur/visites/{id}")
     Call<Void> deleteVisite(@Path("id") int id);
-
-    @POST("login")
-    Call<LoginResponse> login(@Body LoginRequest request);
 }

@@ -131,8 +131,8 @@ public class AllVisitsFragment extends Fragment {
 
     private void addMockDataIfEmpty() {
         if (visiteList.isEmpty()) {
-            visiteList.add(new Visite(1, new Date(), "Visite de routine", "Bilan.pdf", "Jean Dupont", "Dr. Martin"));
-            visiteList.add(new Visite(2, new Date(), "Suivi mensuel", "Suivi.pdf", "Alice Durand", "Dr. Bernard"));
+            visiteList.add(new Visite(1, new Date(), "Visite de routine", "Test bilan","Bilan.pdf", "Jean Dupont", "Dr. Martin"));
+            visiteList.add(new Visite(2, new Date(), "Suivi mensuel", "Test bilan","Suivi.pdf", "Alice Durand", "Dr. Bernard"));
             filter(searchView.getQuery().toString());
         }
     }

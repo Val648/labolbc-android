@@ -31,7 +31,7 @@ public interface ApiService {
     @POST("visiteur/visites")
     Call<Visite> createVisite(@Body Visite visite);
 
-    @POST("visiteur/visites/{id}/report")
+    @POST("visiteur/visites/{id}/pdf")
     Call<Visite> createCompteRendu(@Path("id") int id, @Body Visite visite);
 
     @PUT("visiteur/visites/{id}")

@@ -2,6 +2,7 @@ package com.example.labolbc_android.fragments;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.example.labolbc_android.SessionManager;
 import com.example.labolbc_android.api.ApiClient;
 import com.example.labolbc_android.api.ApiService;
 import com.example.labolbc_android.entity.Praticien;
+import com.example.labolbc_android.entity.PraticiensResponse;
 import com.example.labolbc_android.entity.Visite;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,6 +34,7 @@ import retrofit2.Response;
 
 public class EditVisiteFragment extends Fragment {
 
+    private static final String TAG = "EditVisiteFragment";
     private EditText etVisiteurName, etVisitDate, etMotif, etBilan;
     private Spinner spinnerPraticiens;
     private Button btnSubmit;
@@ -43,13 +46,16 @@ public class EditVisiteFragment extends Fragment {
     private ArrayAdapter<Praticien> praticienAdapter;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
     private Calendar calendar = Calendar.getInstance();
-    private SessionManager sessionManager;
+
+    private boolean isVisiteLoaded = false;
+    private boolean isPraticiensLoaded = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             visiteId = getArguments().getInt("visite_id");
+            Log.d(TAG, "ID de la visite à charger: " + visiteId);
         }
     }
 
@@ -58,8 +64,8 @@ public class EditVisiteFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_edit_visite, container, false);
 
-        sessionManager = new SessionManager(requireContext());
-        
+        SessionManager sessionManager = new SessionManager(requireContext());
+
         etVisiteurName = view.findViewById(R.id.et_visiteur_name);
         etVisitDate = view.findViewById(R.id.et_visit_date);
         etMotif = view.findViewById(R.id.et_motif);
@@ -76,7 +82,7 @@ public class EditVisiteFragment extends Fragment {
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
         btnSubmit.setOnClickListener(v -> updateVisite());
 
-        loadInitialData();
+        loadInitialDataParallel();
 
         return view;
     }
@@ -90,66 +96,77 @@ public class EditVisiteFragment extends Fragment {
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    private void loadInitialData() {
+    private void loadInitialDataParallel() {
         ApiService apiService = ApiClient.getService(getContext());
 
-        // 1. Charger d'abord les praticiens (nécessaire pour la sélection automatique dans le Spinner)
-        apiService.getPraticiensSameRegion().enqueue(new Callback<List<Praticien>>() {
+        // Appel 1 : Charger les praticiens
+        apiService.getPraticiensSameRegion().enqueue(new Callback<PraticiensResponse>() {
             @Override
-            public void onResponse(@NonNull Call<List<Praticien>> call, @NonNull Response<List<Praticien>> response) {
+            public void onResponse(@NonNull Call<PraticiensResponse> call, @NonNull Response<PraticiensResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     praticiensList.clear();
-                    praticiensList.addAll(response.body());
+                    praticiensList.addAll(response.body().getPraticiens());
                     praticienAdapter.notifyDataSetChanged();
-                    
-                    // 2. Charger les détails de la visite
-                    fetchVisiteDetails();
+                    Log.d(TAG, "Praticiens chargés en parallèle");
                 }
+                isPraticiensLoaded = true;
+                checkIfAllLoaded();
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Praticien>> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Erreur lors de la récupération des praticiens", Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<PraticiensResponse> call, @NonNull Throwable t) {
+                Log.e(TAG, "Erreur praticiens parallel", t);
+                isPraticiensLoaded = true;
+                checkIfAllLoaded();
             }
         });
-    }
 
-    private void fetchVisiteDetails() {
-        ApiService apiService = ApiClient.getService(getContext());
-        apiService.getVisiteVisiteur(visiteId).enqueue(new Callback<Visite>() {
+        // Appel 2 : Charger les détails de la visite
+        apiService.getVisite(visiteId).enqueue(new Callback<Visite>() {
             @Override
             public void onResponse(@NonNull Call<Visite> call, @NonNull Response<Visite> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     currentVisite = response.body();
-                    prefillForm();
+                    Log.d(TAG, "Visite chargée en parallèle");
                 }
+                isVisiteLoaded = true;
+                checkIfAllLoaded();
             }
 
             @Override
             public void onFailure(@NonNull Call<Visite> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Erreur lors du chargement des détails", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Erreur visite parallel", t);
+                isVisiteLoaded = true;
+                checkIfAllLoaded();
+                Toast.makeText(getContext(), "Erreur de chargement", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void checkIfAllLoaded() {
+        if (isVisiteLoaded && isPraticiensLoaded) {
+            prefillForm();
+        }
+    }
+
     private void prefillForm() {
-        // Pré-remplir le visiteur (lecture seule)
+        if (currentVisite == null) return;
+
         etVisiteurName.setText(currentVisite.getNomVisiteur());
         
-        // Pré-remplir la date
         if (currentVisite.getDateVisite() != null) {
             etVisitDate.setText(dateFormat.format(currentVisite.getDateVisite()));
             calendar.setTime(currentVisite.getDateVisite());
         }
         
-        // Pré-remplir Motif et Bilan
         etMotif.setText(currentVisite.getMotifVisite());
         etBilan.setText(currentVisite.getBilanVisite());
 
-        // Sélection automatique du praticien dans le Spinner
+        // Sélectionner le praticien via son ID direct (sans getIdPraticien)
         if (currentVisite.getPraticien() != null) {
+            int targetId = currentVisite.getPraticien().idPraticien;
             for (int i = 0; i < praticiensList.size(); i++) {
-                if (praticiensList.get(i).getIdPraticien() == currentVisite.getPraticien().getIdPraticien()) {
+                if (praticiensList.get(i).idPraticien == targetId) {
                     spinnerPraticiens.setSelection(i);
                     break;
                 }
@@ -158,12 +175,14 @@ public class EditVisiteFragment extends Fragment {
     }
 
     private void updateVisite() {
+        if (currentVisite == null) return;
+
         String motif = etMotif.getText().toString().trim();
         String bilan = etBilan.getText().toString().trim();
         Praticien selectedPraticien = (Praticien) spinnerPraticiens.getSelectedItem();
 
         if (motif.isEmpty() || selectedPraticien == null) {
-            Toast.makeText(getContext(), "Le motif et le praticien sont obligatoires", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Champs obligatoires", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -177,16 +196,14 @@ public class EditVisiteFragment extends Fragment {
             @Override
             public void onResponse(@NonNull Call<Visite> call, @NonNull Response<Visite> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Visite modifiée avec succès", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Visite mise à jour", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigateUp();
-                } else {
-                    Toast.makeText(getContext(), "Erreur lors de la modification", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Visite> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Erreur lors de la modification", Toast.LENGTH_SHORT).show();
             }
         });
     }

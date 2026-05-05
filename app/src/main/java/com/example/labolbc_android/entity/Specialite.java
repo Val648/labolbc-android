@@ -1,8 +1,8 @@
 package com.example.labolbc_android.entity;
 
 public class Specialite {
-    private int numeroSequentiel;
-    private String libelle;
+    public int numeroSequentiel;
+    public String libelle;
 
     public Specialite() {}
 

@@ -52,6 +52,9 @@ public class Visite {
     }
 
     public String getNomPraticien() {
-        return praticien != null ? (praticien.getNomPraticien() + " " + praticien.getPrenomPraticien()) : "Inconnu";
+        if (praticien != null) {
+            return (praticien.nom != null ? praticien.nom : "") + " " + (praticien.prenom != null ? praticien.prenom : "");
+        }
+        return "Inconnu";
     }
 }

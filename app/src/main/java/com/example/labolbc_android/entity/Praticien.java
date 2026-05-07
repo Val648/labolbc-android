@@ -4,27 +4,27 @@ import androidx.annotation.NonNull;
 
 public class Praticien {
     public int idPraticien;
-    public String nom;
-    public String prenom;
-    public Specialite specialite;
+    public String nomPraticien;
+    public String prenomPraticien;
+    public Specialite specialitePraticien;
 
     public Praticien() {}
 
     public int getIdPraticien() { return idPraticien; }
     public void setIdPraticien(int idPraticien) { this.idPraticien = idPraticien; }
 
-    public String getNomPraticien() { return nom; }
-    public void setNomPraticien(String nomPraticien) { this.nom = nomPraticien; }
+    public String getNomPraticien() { return nomPraticien; }
+    public void setNomPraticien(String nomPraticien) { this.nomPraticien = nomPraticien; }
 
-    public String getPrenomPraticien() { return prenom; }
-    public void setPrenomPraticien(String prenomPraticien) { this.prenom = prenomPraticien; }
+    public String getPrenomPraticien() { return prenomPraticien; }
+    public void setPrenomPraticien(String prenomPraticien) { this.prenomPraticien = prenomPraticien; }
 
-    public Specialite getSpecialite() { return specialite; }
-    public void setSpecialite(Specialite specialite) { this.specialite = specialite; }
+    public Specialite getSpecialite() { return specialitePraticien; }
+    public void setSpecialite(Specialite specialite) { this.specialitePraticien = specialite; }
 
     @NonNull
     @Override
     public String toString() {
-        return (nom != null ? nom : "") + " " + (prenom != null ? prenom : "");
+        return (nomPraticien != null ? nomPraticien : "") + " " + (prenomPraticien != null ? prenomPraticien : "");
     }
 }

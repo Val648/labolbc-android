@@ -1,22 +1,17 @@
 package com.example.labolbc_android.entity;
 
-import com.google.gson.annotations.SerializedName;
-
 import java.util.Date;
 
 public class Visite {
-    private int id;
+    private int idVisite;
 
-    @SerializedName("date")
     private Date dateVisite;
 
-    @SerializedName("motif")
     private String motifVisite;
 
-    @SerializedName("bilan")
     private String bilanVisite;
 
-    private String compteRendu; // Lien vers le PDF
+    private String compteRenduVisite; // Lien vers le PDF
 
     private Visiteur visiteur;
     private Praticien praticien;
@@ -26,8 +21,8 @@ public class Visite {
     public Visite(int i, Date date, String visiteDeRoutine, String testBilan, String s, String jeanDupont, String s1) {
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() { return idVisite; }
+    public void setId(int id) { this.idVisite = id; }
 
     public Date getDateVisite() { return dateVisite; }
     public void setDateVisite(Date dateVisite) { this.dateVisite = dateVisite; }
@@ -38,8 +33,8 @@ public class Visite {
     public String getBilanVisite() { return bilanVisite; }
     public void setBilanVisite(String bilanVisite) { this.bilanVisite = bilanVisite; }
 
-    public String getCompteRendu() { return compteRendu; }
-    public void setCompteRendu(String compteRendu) { this.compteRendu = compteRendu; }
+    public String getCompteRendu() { return compteRenduVisite; }
+    public void setCompteRendu(String compteRenduVisite) { this.compteRenduVisite = compteRenduVisite; }
 
     public Visiteur getVisiteur() { return visiteur; }
     public void setVisiteur(Visiteur visiteur) { this.visiteur = visiteur; }
@@ -53,7 +48,7 @@ public class Visite {
 
     public String getNomPraticien() {
         if (praticien != null) {
-            return (praticien.nom != null ? praticien.nom : "") + " " + (praticien.prenom != null ? praticien.prenom : "");
+            return (praticien.nomPraticien != null ? praticien.nomPraticien : "") + " " + (praticien.prenomPraticien != null ? praticien.prenomPraticien : "");
         }
         return "Inconnu";
     }

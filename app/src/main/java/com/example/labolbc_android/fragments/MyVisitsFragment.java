@@ -11,6 +11,7 @@ import androidx.navigation.Navigation;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.example.labolbc_android.R;
 import com.example.labolbc_android.SessionManager;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MyVisitsFragment extends Fragment {
 
@@ -23,7 +24,6 @@ public class MyVisitsFragment extends Fragment {
         sessionManager = new SessionManager(requireContext());
 
         if (!sessionManager.isLoggedIn()) {
-            // La redirection est déjà gérée dans MainActivity, mais par sécurité :
             Navigation.findNavController(requireActivity(), R.id.nav_host_fragment)
                     .navigate(R.id.navigation_login);
             return null;
@@ -33,17 +33,16 @@ public class MyVisitsFragment extends Fragment {
         
         swipeRefreshLayout = view.findViewById(R.id.swipe_refresh_my_visits);
         if (swipeRefreshLayout != null) {
-            swipeRefreshLayout.setOnRefreshListener(() -> {
-                // Logique de rechargement ici
-                refreshData();
-            });
+            swipeRefreshLayout.setOnRefreshListener(this::refreshData);
         }
+
+        FloatingActionButton fab = view.findViewById(R.id.fab_add_visite);
+        fab.setOnClickListener(v -> Navigation.findNavController(v).navigate(R.id.navigation_add_visite));
         
         return view;
     }
 
     private void refreshData() {
-        // Simuler un chargement
         swipeRefreshLayout.postDelayed(() -> {
             if (swipeRefreshLayout != null) {
                 swipeRefreshLayout.setRefreshing(false);

@@ -18,6 +18,7 @@ import com.example.labolbc_android.api.ApiClient;
 import com.example.labolbc_android.api.ApiService;
 import com.example.labolbc_android.api.VisiteAdapter;
 import com.example.labolbc_android.entity.Visite;
+import com.example.labolbc_android.entity.VisiteResponse;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -96,15 +97,17 @@ public class AllVisitsFragment extends Fragment {
         }
 
         ApiService apiService = ApiClient.getService(getContext());
-        apiService.getVisites().enqueue(new Callback<List<Visite>>() {
+        apiService.getVisites().enqueue(new Callback<VisiteResponse>() {
             @Override
-            public void onResponse(@NonNull Call<List<Visite>> call, @NonNull Response<List<Visite>> response) {
+            public void onResponse(@NonNull Call<VisiteResponse> call, @NonNull Response<VisiteResponse> response) {
                 if (swipeRefreshLayout != null) {
                     swipeRefreshLayout.setRefreshing(false);
                 }
                 if (response.isSuccessful() && response.body() != null) {
                     visiteList.clear();
-                    visiteList.addAll(response.body());
+                    if (response.body().getVisites() != null) {
+                        visiteList.addAll(response.body().getVisites());
+                    }
                     filter(searchView.getQuery().toString());
                 } else {
                     Toast.makeText(getContext(), "Erreur serveur: " + response.code(), Toast.LENGTH_SHORT).show();
@@ -112,7 +115,7 @@ public class AllVisitsFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(@NonNull Call<List<Visite>> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<VisiteResponse> call, @NonNull Throwable t) {
                 if (swipeRefreshLayout != null) {
                     swipeRefreshLayout.setRefreshing(false);
                 }

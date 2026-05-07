@@ -1,29 +1,30 @@
 package com.example.labolbc_android.entity;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 public class Visite {
-    private int id;
+    private Integer id;
     
-    @SerializedName("date")
+    @SerializedName(value = "date", alternate = {"dateVisite"})
     private Date dateVisite;
     
-    @SerializedName("motif")
+    @SerializedName(value = "motif", alternate = {"motifVisite"})
     private String motifVisite;
     
-    @SerializedName("bilan")
+    @SerializedName(value = "bilan", alternate = {"bilanVisite"})
     private String bilanVisite;
     
-    private String compteRendu; // Lien vers le PDF
+    private String compteRendu;
     
     private Visiteur visiteur;
     private Praticien praticien;
 
     public Visite() {}
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public Date getDateVisite() { return dateVisite; }
     public void setDateVisite(Date dateVisite) { this.dateVisite = dateVisite; }

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <!-- Header / Custom Toolbar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@color/white">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Retour"
+            app:tint="@color/blue_primary" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nouvelle Visite"
+            android:textColor="@color/blue_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Visiteur (Connecté)"
+                android:textColor="@color/blue_dark"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/tv_nom_visiteur_display"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Nom du visiteur"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:background="@color/white"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date de la visite *"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+            <EditText
+                android:id="@+id/et_date_visite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Sélectionner une date"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="none"
+                android:layout_marginBottom="16dp"
+                android:padding="12dp"
+                android:background="@color/white"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Praticien *"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="16dp"
+                android:padding="4dp">
+                <Spinner
+                    android:id="@+id/spinner_praticien"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:backgroundTint="@color/blue_primary"
+                    android:spinnerMode="dropdown"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Motif de la visite *"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+            <EditText
+                android:id="@+id/et_motif"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Saisir le motif"
+                android:inputType="text"
+                android:layout_marginBottom="16dp"
+                android:padding="12dp"
+                android:background="@color/white"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bilan (Optionnel)"
+                android:textStyle="bold"
+                android:textSize="14sp"/>
+            <EditText
+                android:id="@+id/et_bilan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Saisir le bilan si disponible"
+                android:inputType="textMultiLine"
+                android:minLines="3"
+                android:gravity="top"
+                android:layout_marginBottom="24dp"
+                android:padding="12dp"
+                android:background="@color/white"/>
+
+            <Button
+                android:id="@+id/btn_valider"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="VALIDER LA VISITE"
+                android:backgroundTint="@color/blue_primary"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:padding="12dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

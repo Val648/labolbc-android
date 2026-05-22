@@ -3,10 +3,8 @@ package com.example.labolbc_android.entity;
 import com.google.gson.annotations.SerializedName;
 
 public class Specialite {
-    @SerializedName(value = "id", alternate = {"numeroSequentiel"})
-    private int id;
-    
-    private String libelle;
+    public int numeroSequentiel;
+    public String libelle;
 
     public Specialite() {}
 

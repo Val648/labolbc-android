@@ -11,8 +11,8 @@ public class Visiteur {
 
     public Visiteur() {}
 
-    public int getIdVisiteur() { return idVisiteur; }
-    public void setIdVisiteur(int idVisiteur) { this.idVisiteur = idVisiteur; }
+    public int getId() { return idVisiteur; }
+    public void setId(int id) { this.idVisiteur = id; }
 
     public String getNomVisiteur() { return nomVisiteur; }
     public void setNomVisiteur(String nomVisiteur) { this.nomVisiteur = nomVisiteur; }

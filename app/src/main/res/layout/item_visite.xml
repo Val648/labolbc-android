@@ -30,20 +30,27 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/layout_visiteur_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Visiteur: "
-                android:textSize="12sp"
-                android:textColor="@color/black"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Visiteur: "
+                    android:textSize="12sp"
+                    android:textColor="@color/black"/>
 
-            <TextView
-                android:id="@+id/tv_visiteur"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textSize="12sp"
-                android:textStyle="italic"/>
+                <TextView
+                    android:id="@+id/tv_visiteur"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nom"
+                    android:textSize="12sp"
+                    android:textStyle="italic"/>
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -83,20 +90,46 @@
             android:visibility="gone"/>
 
         <LinearLayout
-            android:id="@+id/layout_bilan"
+            android:id="@+id/layout_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_marginTop="8dp"
             android:visibility="gone">
 
-            <TextView
+            <LinearLayout
+                android:id="@+id/layout_edit_delete"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Bilan de la visite :"
                 android:textStyle="bold"
                 android:textSize="13sp"
                 android:textColor="@color/blue_primary"/>
+                android:orientation="horizontal"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btn_edit"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Modifier"
+                    app:icon="@drawable/ic_edit"
+                    android:layout_marginEnd="4dp"/>
+
+                <Button
+                    android:id="@+id/btn_delete"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Supprimer"
+                    app:icon="@drawable/ic_delete"
+                    android:textColor="@android:color/holo_red_dark"
+                    app:iconTint="@android:color/holo_red_dark"
+                    android:layout_marginStart="4dp"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_bilan_text"

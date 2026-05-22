@@ -1,20 +1,12 @@
 package com.example.labolbc_android.entity;
 
-import com.google.gson.annotations.SerializedName;
+import androidx.annotation.NonNull;
 
 public class Praticien {
-    
-    @SerializedName("idPraticien")
-    private int idPraticien;
-    
-    @SerializedName("nom")
-    private String nomPraticien;
-    
-    @SerializedName("prenom")
-    private String prenomPraticien;
-    
-    @SerializedName("specialite")
-    private Specialite specialite;
+    public int idPraticien;
+    public String nomPraticien;
+    public String prenomPraticien;
+    public Specialite specialitePraticien;
 
     public Praticien() {}
 
@@ -27,10 +19,12 @@ public class Praticien {
     public String getPrenomPraticien() { return prenomPraticien; }
     public void setPrenomPraticien(String prenomPraticien) { this.prenomPraticien = prenomPraticien; }
 
-    public Specialite getSpecialite() { return specialite; }
-    public void setSpecialite(Specialite specialite) { this.specialite = specialite; }
+    public Specialite getSpecialite() { return specialitePraticien; }
+    public void setSpecialite(Specialite specialite) { this.specialitePraticien = specialite; }
 
-    public String getSpecialiteLabel() {
-        return specialite != null ? specialite.getLibelle() : "";
+    @NonNull
+    @Override
+    public String toString() {
+        return (nomPraticien != null ? nomPraticien : "") + " " + (prenomPraticien != null ? prenomPraticien : "");
     }
 }

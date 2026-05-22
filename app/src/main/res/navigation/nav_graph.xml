@@ -40,4 +40,10 @@
         android:name="com.example.labolbc_android.fragments.AddVisiteFragment"
         android:label="Ajouter une visite"
         tools:layout="@layout/fragment_add_visite" />
+        android:label="Ajouter une visite" />
+
+    <fragment
+        android:id="@+id/navigation_edit_visite"
+        android:name="com.example.labolbc_android.fragments.EditVisiteFragment"
+        android:label="Modifier la visite" />
 </navigation>

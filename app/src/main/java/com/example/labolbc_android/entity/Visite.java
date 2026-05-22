@@ -6,22 +6,25 @@ import java.util.Date;
 
 public class Visite {
     private int idVisite;
-    
+
     private Date dateVisite;
-    
+
     private String motifVisite;
 
     private String bilanVisite;
-    
-    private String compteRendu;
-    
+
+    private String compteRenduVisite; // Lien vers le PDF
+
     private Visiteur visiteur;
     private Praticien praticien;
 
     public Visite() {}
 
-    public Integer getId() { return idVisite; }
-    public void setId(Integer id) { this.idVisite = idVisite; }
+    public Visite(int i, Date date, String visiteDeRoutine, String testBilan, String s, String jeanDupont, String s1) {
+    }
+
+    public int getId() { return idVisite; }
+    public void setId(int id) { this.idVisite = id; }
 
     public Date getDateVisite() { return dateVisite; }
     public void setDateVisite(Date dateVisite) { this.dateVisite = dateVisite; }
@@ -32,8 +35,8 @@ public class Visite {
     public String getBilanVisite() { return bilanVisite; }
     public void setBilanVisite(String bilanVisite) { this.bilanVisite = bilanVisite; }
 
-    public String getCompteRendu() { return compteRendu; }
-    public void setCompteRendu(String compteRendu) { this.compteRendu = compteRendu; }
+    public String getCompteRendu() { return compteRenduVisite; }
+    public void setCompteRendu(String compteRenduVisite) { this.compteRenduVisite = compteRenduVisite; }
 
     public Visiteur getVisiteur() { return visiteur; }
     public void setVisiteur(Visiteur visiteur) { this.visiteur = visiteur; }
@@ -46,6 +49,9 @@ public class Visite {
     }
 
     public String getNomPraticien() {
-        return praticien != null ? (praticien.getNomPraticien() + " " + praticien.getPrenomPraticien()) : "Inconnu";
+        if (praticien != null) {
+            return (praticien.nomPraticien != null ? praticien.nomPraticien : "") + " " + (praticien.prenomPraticien != null ? praticien.prenomPraticien : "");
+        }
+        return "Inconnu";
     }
 }

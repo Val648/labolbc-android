@@ -1,6 +1,7 @@
 package com.example.labolbc_android.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,7 +73,8 @@ public class LoginFragment extends Fragment {
                     // Rediriger vers le profil
                     Navigation.findNavController(requireView()).navigate(R.id.navigation_profile);
                 } else {
-                    Toast.makeText(getContext(), "Email ou mot de passe incorrect", Toast.LENGTH_SHORT).show();
+                    Log.e("LoginFragment", "Erreur: " + response.code());
+                    Toast.makeText(getContext(), "Email ou mot de passe incorrect (Code: " + response.code() + ")", Toast.LENGTH_SHORT).show();
                 }
             }
 

@@ -5,15 +5,12 @@ import com.google.gson.annotations.SerializedName;
 import java.util.Date;
 
 public class Visite {
-    private Integer id;
+    private int idVisite;
     
-    @SerializedName(value = "date", alternate = {"dateVisite"})
     private Date dateVisite;
     
-    @SerializedName(value = "motif", alternate = {"motifVisite"})
     private String motifVisite;
-    
-    @SerializedName(value = "bilan", alternate = {"bilanVisite"})
+
     private String bilanVisite;
     
     private String compteRendu;
@@ -23,8 +20,8 @@ public class Visite {
 
     public Visite() {}
 
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public Integer getId() { return idVisite; }
+    public void setId(Integer id) { this.idVisite = idVisite; }
 
     public Date getDateVisite() { return dateVisite; }
     public void setDateVisite(Date dateVisite) { this.dateVisite = dateVisite; }

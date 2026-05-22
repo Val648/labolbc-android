@@ -2,6 +2,7 @@ package com.example.labolbc_android.fragments;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,8 +31,10 @@ import com.example.labolbc_android.entity.PraticienResponse;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -60,19 +63,15 @@ public class AddVisiteFragment extends Fragment {
         Button btnValider = view.findViewById(R.id.btn_valider);
         ImageButton btnBack = view.findViewById(R.id.btn_back);
 
-        // Bouton retour
         btnBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
 
-        // Afficher le nom du visiteur
         User user = sessionManager.getUser();
         if (user != null) {
             tvNomVisiteur.setText(user.getName());
         }
 
-        // Date Picker
         etDateVisite.setOnClickListener(v -> showDatePicker());
 
-        // Charger les praticiens
         loadPraticiens();
 
         btnValider.setOnClickListener(v -> validerVisite());
@@ -106,101 +105,99 @@ public class AddVisiteFragment extends Fragment {
                     praticienList = response.body().getPraticiens();
                     
                     if (praticienList == null || praticienList.isEmpty()) {
-                        Toast.makeText(getContext(), "Aucun praticien disponible dans votre région. Accès refusé.", Toast.LENGTH_LONG).show();
-                        Navigation.findNavController(requireView()).navigateUp();
+                        Toast.makeText(getContext(), "Aucun praticien disponible.", Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                     List<String> names = new ArrayList<>();
                     for (Praticien p : praticienList) {
-                        String display = (p.getNomPraticien() != null ? p.getNomPraticien() : "") + 
-                                       " " + (p.getPrenomPraticien() != null ? p.getPrenomPraticien() : "");
-                        names.add(display.trim().isEmpty() ? "Praticien ": display);
+                        String name = (p.getNomPraticien() != null ? p.getNomPraticien() : "") + " " + (p.getPrenomPraticien() != null ? p.getPrenomPraticien() : "");
+                        if (p.getSpecialite() != null) {
+                            name += " (" + p.getSpecialite().getLibelle() + ")";
+                        }
+                        names.add(name.trim().isEmpty() ? "Praticien " + p.getIdPraticien() : name);
                     }
                     
                     ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, names);
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                     spinnerPraticien.setAdapter(adapter);
                 } else {
-                    Toast.makeText(getContext(), "Erreur lors de la récupération des praticiens (" + response.code() + "). Page inaccessible.", Toast.LENGTH_LONG).show();
-                    Navigation.findNavController(requireView()).navigateUp();
+                    Toast.makeText(getContext(), "Erreur praticiens: " + response.code(), Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<PraticienResponse> call, @NonNull Throwable t) {
                 if (!isAdded() || getContext() == null) return;
-                Toast.makeText(getContext(), "Erreur réseau : " + t.getMessage() + ". Page inaccessible.", Toast.LENGTH_LONG).show();
-                Navigation.findNavController(requireView()).navigateUp();
+                Toast.makeText(getContext(), "Erreur de connexion (Praticiens)", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void validerVisite() {
         if (praticienList == null || praticienList.isEmpty()) {
-            Toast.makeText(getContext(), "aucun praticien dans votre région", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Chargement des praticiens en cours...", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String dateStr = etDateVisite.getText().toString().trim();
         String motif = etMotif.getText().toString().trim();
         String bilan = etBilan.getText().toString().trim();
 
-        if (dateStr.isEmpty() || motif.isEmpty() || spinnerPraticien.getSelectedItem() == null) {
-            Toast.makeText(getContext(), "Veuillez remplir tous les champs obligatoires (*)", Toast.LENGTH_SHORT).show();
+        if (motif.isEmpty() || etDateVisite.getText().toString().isEmpty() || spinnerPraticien.getSelectedItem() == null) {
+            Toast.makeText(getContext(), "Veuillez remplir les champs obligatoires", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Praticien selectedPraticien = praticienList.get(spinnerPraticien.getSelectedItemPosition());
-
-        // Construction du praticien pour l'envoi
-        Praticien praticienReq = new Praticien();
-        praticienReq.setIdPraticien(selectedPraticien.getIdPraticien());
-        
-        // On récupère l'ID de la spécialité depuis le praticien sélectionné
-        if (selectedPraticien.getSpecialite() != null) {
-            Specialite specReq = new Specialite();
-            specReq.setId(selectedPraticien.getSpecialite().getId());
-            praticienReq.setSpecialite(specReq);
-        }
-
-        Visite newVisite = new Visite();
-        
-        newVisite.setDateVisite(calendar.getTime());
-        
-        newVisite.setMotifVisite(motif);
-        newVisite.setBilanVisite(bilan.isEmpty() ? null : bilan);
-        newVisite.setPraticien(praticienReq);
-
-        // On ajoute le visiteur avec idVisiteur
         User currentUser = sessionManager.getUser();
-        if (currentUser != null) {
-            Visiteur visiteurRequest = new Visiteur();
-            visiteurRequest.setIdVisiteur(currentUser.getId());
-            newVisite.setVisiteur(visiteurRequest);
+
+        if (currentUser == null) return;
+
+        // On récupère le numeroSequentiel depuis la spécialité
+        int nSeq = (selectedPraticien.getSpecialite() != null) ? selectedPraticien.getSpecialite().getId() : 0;
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("motifVisite", motif);
+        body.put("dateVisite", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(calendar.getTime()));
+        body.put("bilanVisite", bilan.isEmpty() ? null : bilan);
+        
+        // On envoie le numeroSequentiel à la racine car Repertorier en a besoin (Erreur 500)
+        body.put("numeroSequentiel", nSeq);
+        body.put("numseq", nSeq);
+
+        Map<String, Object> praticienMap = new HashMap<>();
+        praticienMap.put("idPraticien", selectedPraticien.getIdPraticien());
+        praticienMap.put("numeroSequentiel", nSeq);
+        
+        if (selectedPraticien.getSpecialite() != null) {
+            Map<String, Object> specialiteMap = new HashMap<>();
+            specialiteMap.put("id", nSeq);
+            praticienMap.put("specialite", specialiteMap);
         }
+        body.put("praticien", praticienMap);
+        
+        Map<String, Object> visiteurMap = new HashMap<>();
+        visiteurMap.put("idVisiteur", currentUser.getId());
+        body.put("visiteur", visiteurMap);
 
         ApiService apiService = ApiClient.getService(requireContext());
-        apiService.createVisite(newVisite).enqueue(new Callback<Visite>() {
+        apiService.createVisite(body).enqueue(new Callback<Visite>() {
             @Override
             public void onResponse(@NonNull Call<Visite> call, @NonNull Response<Visite> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Visite ajoutée avec succès", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Visite ajoutée !", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigateUp();
                 } else {
-                    String errorDetail = "";
-                    try {
-                        if (response.errorBody() != null) {
-                            errorDetail = " : " + response.errorBody().string();
-                        }
-                    } catch (Exception ignored) {}
-                    Toast.makeText(getContext(), "Erreur " + response.code() + errorDetail, Toast.LENGTH_LONG).show();
+                    String error = "";
+                    try { if (response.errorBody() != null) error = response.errorBody().string(); } catch (Exception ignored) {}
+                    Log.e("AddVisite", "Erreur " + response.code() + ": " + error);
+                    Toast.makeText(getContext(), "Erreur serveur (" + response.code() + ")", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Visite> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Échec de la connexion", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Erreur de connexion", Toast.LENGTH_SHORT).show();
             }
         });
     }

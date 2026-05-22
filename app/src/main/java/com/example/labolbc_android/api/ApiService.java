@@ -19,7 +19,7 @@ import retrofit2.http.Path;
 
 public interface ApiService {
     @GET("visites")
-    Call<VisiteResponse> getVisites();
+    Call<List<Visite>> getVisites();
 
     @GET("praticiens")
     Call<PraticienResponse> getPraticiens();
@@ -28,13 +28,13 @@ public interface ApiService {
     Call<Visite> getVisite(@Path("id") int id);
 
     @GET("visiteur/visites")
-    Call<VisiteResponse> getVisitesVisiteur();
+    Call<List<Visite>> getVisitesVisiteur();
 
     @GET("visiteur/visites/{id}")
     Call<Visite> getVisiteVisiteur(@Path("id") int id);
 
     @POST("visiteur/visites")
-    Call<Visite> createVisite(@Body Visite visite);
+    Call<Visite> createVisite(@Body Object body);
 
     @POST("visiteur/visites/{id}/pdf")
     Call<Visite> createCompteRendu(@Path("id") int id, @Body Visite visite);

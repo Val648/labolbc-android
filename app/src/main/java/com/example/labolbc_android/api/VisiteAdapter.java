@@ -55,6 +55,16 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         holder.tvDate.setText(visite.getDateVisite() != null ? dateFormat.format(visite.getDateVisite()) : "-");
         holder.tvMotif.setText(visite.getMotifVisite());
         holder.tvPraticien.setText(visite.getNomPraticien());
+        
+        // Affichage du bilan textuel dans la partie dépliée
+        holder.tvBilanText.setText(visite.getBilanVisite() != null ? visite.getBilanVisite() : "Aucun bilan saisi.");
+
+        // Afficher ou cacher le bouton de téléchargement selon si compteRendu est présent
+        if (visite.getCompteRendu() != null && !visite.getCompteRendu().isEmpty()) {
+            holder.btnDownloadPdf.setVisibility(View.VISIBLE);
+        } else {
+            holder.btnDownloadPdf.setVisibility(View.GONE);
+        }
 
         // Mode personnel : Masquer le visiteur, afficher les boutons modifier/supprimer
         if (isPersonalMode) {
@@ -76,7 +86,7 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         holder.btnDownloadPdf.setOnClickListener(v -> {
             Toast.makeText(v.getContext(), "Téléchargement du bilan...", Toast.LENGTH_SHORT).show();
         });
-
+      
         holder.btnEdit.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putInt("visite_id", visite.getId());
@@ -92,6 +102,66 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         });
     }
 
+    private void processPdf(Context context, Visite visite) {
+        String pdfUrl = visite.getCompteRendu();
+        if (pdfUrl == null || pdfUrl.isEmpty()) return;
+
+        // Si le lien est interne (assets), on garde la logique de copie pour le test
+        if (pdfUrl.equals("feuille1.pdf")) {
+            copyAssetPdf(context, visite, pdfUrl);
+        } else {
+            // Sinon, téléchargement normal via internet
+            downloadFromWeb(context, visite, pdfUrl);
+        }
+    }
+
+    private void copyAssetPdf(Context context, Visite visite, String fileName) {
+        File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "compte_rendu_" + visite.getId() + ".pdf");
+        try {
+            InputStream in = context.getAssets().open(fileName);
+            OutputStream out = new FileOutputStream(outFile);
+            byte[] buffer = new byte[1024];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            out.flush();
+            out.close();
+            openPdf(context, outFile);
+        } catch (Exception e) {
+            Toast.makeText(context, "Erreur lecture fichier local", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void downloadFromWeb(Context context, Visite visite, String url) {
+        try {
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+            request.setTitle("Compte-Rendu Visite " + visite.getId());
+            request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "compte_rendu_" + visite.getId() + ".pdf");
+
+            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+            if (manager != null) manager.enqueue(request);
+            Toast.makeText(context, "Téléchargement du PDF lancé...", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(context, "URL invalide ou erreur réseau", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void openPdf(Context context, File file) {
+        try {
+            Uri uri = FileProvider.getUriForFile(context, context.getPackageName() + ".fileprovider", file);
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(uri, "application/pdf");
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(context, "Aucune application PDF trouvée", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     public int getItemCount() {
         return visites != null ? visites.size() : 0;
@@ -103,8 +173,8 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
     }
 
     static class VisiteViewHolder extends RecyclerView.ViewHolder {
-        TextView tvDate, tvMotif, tvVisiteur, tvPraticien, tvClickHint;
-        LinearLayout layoutActions, layoutEditDelete, layoutVisiteurInfo;
+        TextView tvDate, tvMotif, tvVisiteur, tvPraticien, tvClickHint, tvBilanText;
+        LinearLayout layoutBilan, layoutActions, layoutEditDelete, layoutVisiteurInfo;
         Button btnDownloadPdf, btnEdit, btnDelete;
         View divider;
 
@@ -115,6 +185,8 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
             tvVisiteur = itemView.findViewById(R.id.tv_visiteur);
             tvPraticien = itemView.findViewById(R.id.tv_praticien);
             tvClickHint = itemView.findViewById(R.id.tv_click_hint);
+            tvBilanText = itemView.findViewById(R.id.tv_bilan_text);
+            layoutBilan = itemView.findViewById(R.id.layout_bilan);
             layoutActions = itemView.findViewById(R.id.layout_actions);
             layoutEditDelete = itemView.findViewById(R.id.layout_edit_delete);
             layoutVisiteurInfo = itemView.findViewById(R.id.layout_visiteur_info);

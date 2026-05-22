@@ -1,5 +1,7 @@
 package com.example.labolbc_android.entity;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Date;
 
 public class Visite {

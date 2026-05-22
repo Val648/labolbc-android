@@ -5,6 +5,8 @@ public class LoginRequest {
     private String password;
     private String device;
 
+    private String device;
+
     public LoginRequest(String email, String password) {
         this.email = email;
         this.password = password;

@@ -80,6 +80,8 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         holder.btnEdit.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putInt("visite_id", visite.getId());
+            // On peut aussi passer l'ID sous forme de chaîne ou l'objet complet si on veut de l'instantané
+            // Mais pour l'instant restons sur l'ID et optimisons le fragment
             Navigation.findNavController(v).navigate(R.id.navigation_edit_visite, bundle);
         });
 

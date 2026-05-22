@@ -121,10 +121,12 @@ public class MyVisitsFragment extends Fragment {
                 if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
                 
                 if (response.isSuccessful() && response.body() != null) {
+                    Log.d("MyVisitsFragment", "Visites reçues : " + response.body().size());
                     visiteList.clear();
                     visiteList.addAll(response.body());
                     filter(searchView.getQuery().toString());
                 } else {
+                    Log.e("MyVisitsFragment", "Erreur : " + response.code() + " " + response.message());
                     Toast.makeText(getContext(), "Erreur de chargement des visites", Toast.LENGTH_SHORT).show();
                 }
             }

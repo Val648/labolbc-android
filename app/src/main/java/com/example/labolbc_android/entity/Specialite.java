@@ -8,8 +8,13 @@ public class Specialite {
 
     public Specialite() {}
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public Specialite(int numeroSequentiel, String libelle) {
+        this.numeroSequentiel = numeroSequentiel;
+        this.libelle = libelle;
+    }
+
+    public int getNumeroSequentiel() { return numeroSequentiel; }
+    public void setNumeroSequentiel(int id) { this.numeroSequentiel = id; }
 
     public String getLibelle() { return libelle; }
     public void setLibelle(String libelle) { this.libelle = libelle; }

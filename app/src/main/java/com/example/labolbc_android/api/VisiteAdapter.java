@@ -102,6 +102,7 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         });
     }
 
+    /*
     private void processPdf(Context context, Visite visite) {
         String pdfUrl = visite.getCompteRendu();
         if (pdfUrl == null || pdfUrl.isEmpty()) return;
@@ -114,6 +115,7 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
             downloadFromWeb(context, visite, pdfUrl);
         }
     }
+
 
     private void copyAssetPdf(Context context, Visite visite, String fileName) {
         File outFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "compte_rendu_" + visite.getId() + ".pdf");
@@ -160,7 +162,7 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         } catch (Exception e) {
             Toast.makeText(context, "Aucune application PDF trouvée", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
     @Override
     public int getItemCount() {
@@ -185,8 +187,10 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
             tvVisiteur = itemView.findViewById(R.id.tv_visiteur);
             tvPraticien = itemView.findViewById(R.id.tv_praticien);
             tvClickHint = itemView.findViewById(R.id.tv_click_hint);
+            /*
             tvBilanText = itemView.findViewById(R.id.tv_bilan_text);
             layoutBilan = itemView.findViewById(R.id.layout_bilan);
+            */
             layoutActions = itemView.findViewById(R.id.layout_actions);
             layoutEditDelete = itemView.findViewById(R.id.layout_edit_delete);
             layoutVisiteurInfo = itemView.findViewById(R.id.layout_visiteur_info);

@@ -154,7 +154,7 @@ public class AddVisiteFragment extends Fragment {
         if (currentUser == null) return;
 
         // On récupère le numeroSequentiel depuis la spécialité
-        int nSeq = (selectedPraticien.getSpecialite() != null) ? selectedPraticien.getSpecialite().getId() : 0;
+        int nSeq = (selectedPraticien.getSpecialite() != null) ? selectedPraticien.getSpecialite().getNumeroSequentiel() : 0;
 
         Map<String, Object> body = new HashMap<>();
         body.put("motifVisite", motif);

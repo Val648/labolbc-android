@@ -21,6 +21,7 @@ import com.example.labolbc_android.api.ApiService;
 import com.example.labolbc_android.api.VisiteAdapter;
 import com.example.labolbc_android.entity.Visite;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -148,13 +149,25 @@ public class MyVisitsFragment extends Fragment {
                     Toast.makeText(getContext(), "Visite supprimée", Toast.LENGTH_SHORT).show();
                     fetchMyVisites(); // Recharger la liste
                 } else {
-                    Toast.makeText(getContext(), "Échec de la suppression", Toast.LENGTH_SHORT).show();
+                    String errorMsg = "Échec de la suppression";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorStr = response.errorBody().string();
+                            JsonObject errorJson = new com.google.gson.Gson().fromJson(errorStr, JsonObject.class);
+                            if (errorJson.has("message")) {
+                                errorMsg = errorJson.get("message").getAsString();
+                            } else if (errorJson.has("error")) {
+                                errorMsg = errorJson.get("error").getAsString();
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
-                Toast.makeText(getContext(), "Erreur réseau", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Erreur réseau : " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

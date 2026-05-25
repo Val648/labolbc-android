@@ -30,7 +30,7 @@ public class ApiClient {
                 .build();
 
         Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy-MM-dd")
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()

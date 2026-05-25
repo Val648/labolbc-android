@@ -28,6 +28,8 @@ import com.example.labolbc_android.entity.Visite;
 import com.example.labolbc_android.entity.Visiteur;
 import java.text.SimpleDateFormat;
 import com.example.labolbc_android.entity.PraticienResponse;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -153,50 +155,71 @@ public class AddVisiteFragment extends Fragment {
 
         if (currentUser == null) return;
 
-        // On récupère le numeroSequentiel depuis la spécialité
-        int nSeq = (selectedPraticien.getSpecialite() != null) ? selectedPraticien.getSpecialite().getNumeroSequentiel() : 0;
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("motifVisite", motif);
-        body.put("dateVisite", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(calendar.getTime()));
-        body.put("bilanVisite", bilan.isEmpty() ? null : bilan);
+        // Utilisation de JsonObject pour un contrôle total sur la structure
+        JsonObject body = new JsonObject();
+        body.addProperty("dateVisite", new SimpleDateFormat("yyyy-MM-dd", Locale.US).format(calendar.getTime()));
+        body.addProperty("motifVisite", motif);
         
-        // On envoie le numeroSequentiel à la racine car Repertorier en a besoin (Erreur 500)
-        body.put("numeroSequentiel", nSeq);
-        body.put("numseq", nSeq);
+        if (bilan.isEmpty()) {
+            body.add("bilanVisite", JsonNull.INSTANCE);
+        } else {
+            body.addProperty("bilanVisite", bilan);
+        }
 
-        Map<String, Object> praticienMap = new HashMap<>();
-        praticienMap.put("idPraticien", selectedPraticien.getIdPraticien());
-        praticienMap.put("numeroSequentiel", nSeq);
+        body.add("compteRenduVisite", JsonNull.INSTANCE);
+
+        JsonObject visiteurObj = new JsonObject();
+        visiteurObj.addProperty("idVisiteur", currentUser.getId());
+        visiteurObj.addProperty("nomVisiteur", currentUser.getName());
+        body.add("visiteur", visiteurObj);
+
+        JsonObject praticienObj = new JsonObject();
+        praticienObj.addProperty("idPraticien", selectedPraticien.getIdPraticien());
         
         if (selectedPraticien.getSpecialite() != null) {
-            Map<String, Object> specialiteMap = new HashMap<>();
-            specialiteMap.put("id", nSeq);
-            praticienMap.put("specialite", specialiteMap);
+            JsonObject specObj = new JsonObject();
+            specObj.addProperty("numeroSequentiel", selectedPraticien.getSpecialite().getNumeroSequentiel());
+            praticienObj.add("specialitePraticien", specObj);
+        } else {
+            // Sécurité : Si on arrive ici, c'est que la spécialité n'a pas été chargée
+            Toast.makeText(getContext(), "Erreur : Spécialité du praticien manquante", Toast.LENGTH_SHORT).show();
+            return;
         }
-        body.put("praticien", praticienMap);
-        
-        Map<String, Object> visiteurMap = new HashMap<>();
-        visiteurMap.put("idVisiteur", currentUser.getId());
-        body.put("visiteur", visiteurMap);
+        body.add("praticien", praticienObj);
 
         ApiService apiService = ApiClient.getService(requireContext());
-        apiService.createVisite(body).enqueue(new Callback<Visite>() {
+        apiService.createVisite(body).enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(@NonNull Call<Visite> call, @NonNull Response<Visite> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Visite ajoutée !", Toast.LENGTH_SHORT).show();
+            public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String msg = response.body().has("message") ? response.body().get("message").getAsString() : "Visite ajoutée !";
+                    Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
                     Navigation.findNavController(requireView()).navigateUp();
                 } else {
-                    String error = "";
-                    try { if (response.errorBody() != null) error = response.errorBody().string(); } catch (Exception ignored) {}
-                    Log.e("AddVisite", "Erreur " + response.code() + ": " + error);
-                    Toast.makeText(getContext(), "Erreur serveur (" + response.code() + ")", Toast.LENGTH_LONG).show();
+                    String errorMsg = "Erreur lors de l'ajout";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorStr = response.errorBody().string();
+                            JsonObject errorJson = new com.google.gson.Gson().fromJson(errorStr, JsonObject.class);
+                            if (errorJson.has("message")) {
+                                errorMsg = errorJson.get("message").getAsString();
+                            } else if (errorJson.has("error")) {
+                                errorMsg = errorJson.get("error").getAsString();
+                            }
+                        }
+                    } catch (Exception ignored) {}
+
+                    if (response.code() == 409 || response.code() == 400) {
+                        Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                    } else {
+                        Log.e("AddVisite", "Erreur " + response.code() + ": " + errorMsg);
+                        Toast.makeText(getContext(), "Erreur serveur (" + response.code() + ")", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
             @Override
-            public void onFailure(@NonNull Call<Visite> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(), "Erreur de connexion", Toast.LENGTH_SHORT).show();
             }
         });

@@ -1,12 +1,8 @@
 package com.example.labolbc_android.entity;
 
-import com.google.gson.annotations.SerializedName;
-
 public class Visiteur {
-    @SerializedName("idVisiteur")
     private int idVisiteur;
-    
-    @SerializedName("nom")
+
     private String nomVisiteur;
 
     public Visiteur() {}

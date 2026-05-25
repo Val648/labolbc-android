@@ -1,9 +1,7 @@
 package com.example.labolbc_android.api;
 
-import com.example.labolbc_android.entity.Praticien;
 import com.example.labolbc_android.entity.PraticienResponse;
 import com.example.labolbc_android.entity.Visite;
-import com.example.labolbc_android.entity.VisiteResponse;
 import com.example.labolbc_android.entity.LoginRequest;
 import com.example.labolbc_android.entity.LoginResponse;
 import com.example.labolbc_android.entity.RegisterRequest;
@@ -34,7 +32,7 @@ public interface ApiService {
     Call<Visite> getVisiteVisiteur(@Path("id") int id);
 
     @POST("visiteur/visites")
-    Call<Visite> createVisite(@Body Object body);
+    Call<com.google.gson.JsonObject> createVisite(@Body Object body);
 
     @POST("visiteur/visites/{id}/pdf")
     Call<Visite> createCompteRendu(@Path("id") int id, @Body Visite visite);

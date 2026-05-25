@@ -120,8 +120,8 @@ public class EditVisiteFragment extends Fragment {
             public void onResponse(@NonNull Call<JsonObject> call, @NonNull Response<JsonObject> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     JsonObject json = response.body();
-                    etMotif.setText(json.has("motifVisite") ? json.get("motifVisite").getAsString() : "");
-                    etBilan.setText(json.has("bilanVisite") ? json.get("bilanVisite").getAsString() : "");
+                    etMotif.setText(json.has("motifVisite") && !json.get("motifVisite").isJsonNull() ? json.get("motifVisite").getAsString() : "");
+                    etBilan.setText(json.has("bilanVisite") && !json.get("bilanVisite").isJsonNull() ? json.get("bilanVisite").getAsString() : "");
                     if (json.has("visiteur")) {
                         JsonObject v = json.getAsJsonObject("visiteur");
                         etVisiteurName.setText(v.has("nomVisiteur") ? v.get("nomVisiteur").getAsString() : "");
@@ -130,7 +130,9 @@ public class EditVisiteFragment extends Fragment {
                     if (json.has("praticien")) {
                         JsonObject p = json.getAsJsonObject("praticien");
                         initialIdPraticien = p.get("idPraticien").getAsInt();
-                        initialNumeroSequentiel = p.get("numeroSequentiel").getAsInt();
+                        if (p.has("specialitePraticien")) {
+                            initialNumeroSequentiel = p.getAsJsonObject("specialitePraticien").get("numeroSequentiel").getAsInt();
+                        }
                     }
                     if (json.has("dateVisite")) {
                         try {
@@ -156,10 +158,10 @@ public class EditVisiteFragment extends Fragment {
                         JsonObject obj = el.getAsJsonObject();
                         Praticien p = new Praticien();
                         p.setIdPraticien(obj.get("idPraticien").getAsInt());
-                        p.setNomPraticien(obj.get("nom").getAsString());
-                        p.setPrenomPraticien(obj.get("prenom").getAsString());
-                        if (obj.has("specialite")) {
-                            JsonObject s = obj.getAsJsonObject("specialite");
+                        p.setNomPraticien(obj.has("nomPraticien") ? obj.get("nomPraticien").getAsString() : obj.get("nom").getAsString());
+                        p.setPrenomPraticien(obj.has("prenomPraticien") ? obj.get("prenomPraticien").getAsString() : obj.get("prenom").getAsString());
+                        if (obj.has("specialitePraticien")) {
+                            JsonObject s = obj.getAsJsonObject("specialitePraticien");
                             p.setSpecialite(new Specialite(s.get("numeroSequentiel").getAsInt(), s.get("libelle").getAsString()));
                         }
                         praticiensList.add(p);
@@ -209,9 +211,31 @@ public class EditVisiteFragment extends Fragment {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Visite mise à jour", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigateUp();
+                } else {
+                    String errorMsg = "Erreur lors de la modification";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorStr = response.errorBody().string();
+                            JsonObject errorJson = new com.google.gson.Gson().fromJson(errorStr, JsonObject.class);
+                            if (errorJson.has("message")) {
+                                errorMsg = errorJson.get("message").getAsString();
+                            } else if (errorJson.has("error")) {
+                                errorMsg = errorJson.get("error").getAsString();
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Erreur parsing errorBody", e);
+                    }
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Code erreur API : " + response.code() + " - " + errorMsg);
                 }
             }
-            @Override public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {}
+
+            @Override
+            public void onFailure(@NonNull Call<JsonObject> call, @NonNull Throwable t) {
+                Toast.makeText(getContext(), "Erreur réseau : " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Failure modification", t);
+            }
         });
     }
 }

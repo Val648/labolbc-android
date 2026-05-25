@@ -1,6 +1,8 @@
 package com.example.labolbc_android.api;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,15 +58,23 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         holder.tvMotif.setText(visite.getMotifVisite());
         holder.tvPraticien.setText(visite.getNomPraticien());
         
-        // Affichage du bilan textuel dans la partie dépliée
-        holder.tvBilanText.setText(visite.getBilanVisite() != null ? visite.getBilanVisite() : "Aucun bilan saisi.");
+        // Affichage du bilan textuel (Commenté pour éviter le crash car le TextView n'est pas encore prêt dans le XML)
+        /*
+        if (holder.tvBilanText != null) {
+            holder.tvBilanText.setText(visite.getBilanVisite() != null ? visite.getBilanVisite() : "Aucun bilan saisi.");
+        }
+        */
 
+        /*
         // Afficher ou cacher le bouton de téléchargement selon si compteRendu est présent
         if (visite.getCompteRendu() != null && !visite.getCompteRendu().isEmpty()) {
             holder.btnDownloadPdf.setVisibility(View.VISIBLE);
         } else {
             holder.btnDownloadPdf.setVisibility(View.GONE);
         }
+        */
+        // On affiche toujours le bouton PDF pour toutes les visites comme demandé
+        holder.btnDownloadPdf.setVisibility(View.VISIBLE);
 
         // Mode personnel : Masquer le visiteur, afficher les boutons modifier/supprimer
         if (isPersonalMode) {
@@ -84,7 +94,14 @@ public class VisiteAdapter extends RecyclerView.Adapter<VisiteAdapter.VisiteView
         });
 
         holder.btnDownloadPdf.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Téléchargement du bilan...", Toast.LENGTH_SHORT).show();
+            String url = com.example.labolbc_android.BuildConfig.BASE_URL + "visiteur/visites/" + visite.getId() + "/pdf";
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                v.getContext().startActivity(intent);
+            } catch (Exception e) {
+                Toast.makeText(v.getContext(), "Erreur lors de l'ouverture du PDF", Toast.LENGTH_SHORT).show();
+            }
         });
       
         holder.btnEdit.setOnClickListener(v -> {
